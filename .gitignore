@@ -1,0 +1,20 @@
+# Virtual environment
+env/
+venv/
+ENV/
+bin/
+include/
+lib/
+share/
+
+# Python cache and temporary files
+__pycache__/
+*.py[cod]
+*$py.class
+*.ipynb_checkpoints/
+
+# Data files (optional, but good practice to keep separate from repository code)
+# retail_sale_cleaned.csv
+
+# Large Model files (uncomment if you do not want to push model binaries to git)
+# *.pkl

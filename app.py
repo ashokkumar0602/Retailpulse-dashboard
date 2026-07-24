@@ -379,9 +379,9 @@ elif section == "🤖 Predictive Models":
             drop_first=True
         )
         y = data['high_value']
-        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42)
         
-        model = RandomForestClassifier(n_estimators=100, random_state=42, n_jobs=-1)
+        model = RandomForestClassifier(n_estimators=80,max_depth=8,min_samples_split=10,min_samples_leaf=5,max_features="sqrt",bootstrap=True, random_state=42, n_jobs=-1)
         model.fit(X_train, y_train)
         pred = model.predict(X_test)
         
@@ -409,7 +409,7 @@ elif section == "🤖 Predictive Models":
         st.code(report, language="text")
         
         if st.button("💾 Save Classifier", type="primary"):
-            joblib.dump(model, 'high_value_model.pkl')
+            joblib.dump(model, 'high_value_classifier_model.pkl')
             st.success("✅ High-Value Model saved successfully!")
 
 # ====================== LIVE PREDICTION ======================

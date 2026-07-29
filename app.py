@@ -6,8 +6,7 @@ import plotly.graph_objects as go
 from scipy import stats
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LinearRegression
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.metrics import r2_score, mean_squared_error, accuracy_score, classification_report
+from sklearn.metrics import r2_score, mean_squared_error
 import joblib
 import os
 from datetime import datetime
@@ -110,7 +109,7 @@ if len(date_range) == 2:
 store_filter = st.sidebar.multiselect(
     "Select Stores",
     options=filtered_df['store'].unique(),
-    default=filtered_df['store'].unique()
+    default=list(filtered_df['store'].unique())
 )
 
 if store_filter:
@@ -349,11 +348,10 @@ elif section == "🔬 Statistical Insights":
         st.subheader("Contingency Table")
         st.dataframe(ct, use_container_width=True)
 
-# ====================== PREDICTIVE MODELS ======================
+# ====================== PREDICTIVE MODELS (REGRESSION ONLY) ======================
 elif section == "🤖 Predictive Models":
-    st.header("Machine Learning Models")
-    
-    model_type = st.radio("Select Model Type", ["Revenue Prediction (Regression)", "High-Value Purchase Prediction"])
+    st.header("Machine Learning Model")
+    st.subheader("Linear Regression – Revenue Prediction")
     
     @st.cache_resource
     def train_revenue_model(data):
@@ -371,51 +369,22 @@ elif section == "🤖 Predictive Models":
         
         return model, r2_score(y_test, pred), np.sqrt(mean_squared_error(y_test, pred))
     
-    @st.cache_resource
-    def train_classifier(data):
-        X = pd.get_dummies(
-            data.drop(['id', 'timestamp', 'total_amount', 'customer_id', 'product_id', 'date', 'high_value'], 
-                     axis=1, errors='ignore'), 
-            drop_first=True
-        )
-        y = data['high_value']
-        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42)
-        
-        model = RandomForestClassifier(n_estimators=80,max_depth=8,min_samples_split=10,min_samples_leaf=5,max_features="sqrt",bootstrap=True, random_state=42, n_jobs=-1)
-        model.fit(X_train, y_train)
-        pred = model.predict(X_test)
-        
-        return model, accuracy_score(y_test, pred), classification_report(y_test, pred)
+    model, r2, rmse = train_revenue_model(filtered_df)
     
-    if model_type == "Revenue Prediction (Regression)":
-        st.subheader("Linear Regression - Revenue Prediction")
-        model, r2, rmse = train_revenue_model(filtered_df)
-        
-        col1, col2 = st.columns(2)
-        with col1:
-            st.metric("R² Score", f"{r2:.4f}", help="Higher is better")
-        with col2:
-            st.metric("RMSE", f"${rmse:.2f}", help="Lower is better")
-        
-        if st.button("💾 Save Revenue Model", type="primary"):
-            joblib.dump(model, 'revenue_model.pkl')
-            st.success("✅ Revenue Model saved successfully!")
+    col1, col2 = st.columns(2)
+    with col1:
+        st.metric("R² Score", f"{r2:.4f}", help="Higher is better")
+    with col2:
+        st.metric("RMSE", f"${rmse:.2f}", help="Lower is better")
     
-    else:
-        st.subheader("Random Forest - High-Value Purchase Classifier")
-        model, acc, report = train_classifier(filtered_df)
-        
-        st.metric("Accuracy", f"{acc:.4f}")
-        st.code(report, language="text")
-        
-        if st.button("💾 Save Classifier", type="primary"):
-            joblib.dump(model, 'high_value_classifier_model.pkl')
-            st.success("✅ High-Value Model saved successfully!")
+    if st.button("💾 Save Revenue Model", type="primary"):
+        joblib.dump(model, 'revenue_model.pkl')
+        st.success("✅ Revenue Model saved successfully!")
 
 # ====================== LIVE PREDICTION ======================
 elif section == "🔮 Live Prediction":
-    st.header("🔮 Real-time Prediction Engine")
-    st.markdown("Adjust parameters below for instant predictions")
+    st.header("🔮 Real-time Revenue Prediction")
+    st.markdown("Adjust parameters below for instant revenue predictions")
     
     col1, col2 = st.columns([1, 1])
     

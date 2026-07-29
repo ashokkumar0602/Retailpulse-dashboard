@@ -1,3 +1,5 @@
+LIVE LINK:https://retailpulse-dashboard-wxtmpxjgnlaagtntnosszg.streamlit.app/
+
 # 🛒 RetailPulse — Sales Intelligence Dashboard
 
 RetailPulse is an interactive, real-time sales intelligence and business analytics dashboard built with **Streamlit**, **Plotly**, and **Scikit-learn**. Designed for data-driven retail management, the application translates transactional raw data into actionable insights, statistical proofs, and predictive revenue forecasts.
